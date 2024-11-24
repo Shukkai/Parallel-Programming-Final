@@ -11,7 +11,14 @@ double TSPSolver::calculateDistance(const Point &p1, const Point &p2) const
     return std::sqrt(dx * dx + dy * dy);
 }
 
-int TSPSolver::findNearestNeighbor(int currentCity, const std::vector<bool> &visited) const
+double TSPAlgorithm::calculateDistance(const Point &p1, const Point &p2) const
+{
+    double dx = p1.x - p2.x;
+    double dy = p1.y - p2.y;
+    return std::sqrt(dx * dx + dy * dy);
+}
+
+int TSPAlgorithm::findNearestNeighbor(int currentCity, const std::vector<bool> &visited) const
 {
     double minDistance = std::numeric_limits<double>::max();
     int nearestCity = -1;
@@ -28,7 +35,7 @@ int TSPSolver::findNearestNeighbor(int currentCity, const std::vector<bool> &vis
     return nearestCity;
 }
 
-void TSPSolver::solveNearestNeighbor()
+void TSPAlgorithm::solveNearestNeighbor()
 {
     int n = points.size();
     std::vector<bool> visited(n, false);
@@ -56,7 +63,7 @@ void TSPSolver::solveNearestNeighbor()
     totalDistance = calculateTourDistance(currentTour);
 }
 
-void TSPSolver::reverse(std::vector<int> &tour, int start, int end)
+void TSPAlgorithm::reverse(std::vector<int> &tour, int start, int end)
 {
     while (start < end) {
         std::swap(tour[start], tour[end]);
@@ -65,7 +72,7 @@ void TSPSolver::reverse(std::vector<int> &tour, int start, int end)
     }
 }
 
-double TSPSolver::calculateTourDistance(const std::vector<int> &tour) const
+double TSPAlgorithm::calculateTourDistance(const std::vector<int> &tour) const
 {
     double distance = 0;
     for (size_t i = 0; i < tour.size() - 1; ++i) {
@@ -74,7 +81,7 @@ double TSPSolver::calculateTourDistance(const std::vector<int> &tour) const
     return distance;
 }
 
-bool TSPSolver::improve2Opt(std::vector<int> &tour, double &distance)
+bool TSPAlgorithm::improve2Opt(std::vector<int> &tour, double &distance)
 {
     int n = tour.size() - 1; // Don't include last city (same as first)
     bool improved = false;
@@ -97,14 +104,14 @@ bool TSPSolver::improve2Opt(std::vector<int> &tour, double &distance)
     return improved;
 }
 
-void TSPSolver::improve2Opt()
+void TSPAlgorithm::improve2Opt()
 {
     while (improve2Opt(currentTour, totalDistance)) {
         // Continue until no more improvements can be made
     }
 }
 
-void TSPSolver::printTour() const
+void TSPAlgorithm::printTour() const
 {
     std::cout << "\nTour path:" << std::endl;
     for (size_t i = 0; i < currentTour.size(); ++i) {

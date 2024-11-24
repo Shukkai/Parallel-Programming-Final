@@ -1,3 +1,4 @@
+#include "ACO.h"
 #include "reader.h"
 #include "solver.h"
 #include <chrono>
@@ -16,26 +17,30 @@ int main(int argc, char *argv[])
     // Print the original data
     reader.printData();
 
-    // Solve TSP
-    std::cout << "\nSolving TSP..." << std::endl;
-    auto start = std::chrono::high_resolution_clock::now();
+    ACO solver(reader.getPoints());
+    solver.solve();
+    std::cout << solver.getDistance() << std::endl;
 
-    TSPSolver solver(reader.getPoints());
+    // // Solve TSP
+    // std::cout << "\nSolving TSP..." << std::endl;
+    // auto start = std::chrono::high_resolution_clock::now();
 
-    // First solve using Nearest Neighbor
-    solver.solveNearestNeighbor();
-    std::cout << "\nInitial solution (Nearest Neighbor):" << std::endl;
-    solver.printTour();
+    // TSPAlgorithm solver(reader.getPoints());
 
-    // Then improve using 2-opt
-    std::cout << "\nImproving solution with 2-opt..." << std::endl;
-    solver.improve2Opt();
-    std::cout << "\nFinal solution (after 2-opt):" << std::endl;
-    solver.printTour();
+    // // First solve using Nearest Neighbor
+    // solver.solveNearestNeighbor();
+    // std::cout << "\nInitial solution (Nearest Neighbor):" << std::endl;
+    // solver.printTour();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    std::cout << "\nSolution found in " << duration.count() << " milliseconds" << std::endl;
+    // // Then improve using 2-opt
+    // std::cout << "\nImproving solution with 2-opt..." << std::endl;
+    // solver.improve2Opt();
+    // std::cout << "\nFinal solution (after 2-opt):" << std::endl;
+    // solver.printTour();
+
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    // std::cout << "\nSolution found in " << duration.count() << " milliseconds" << std::endl;
 
     return 0;
 }
