@@ -1,15 +1,14 @@
-#include "header/reader.h"
-#include "header/solver.h"
-#include <iostream>
+#include "reader.h"
+#include "solver.h"
 #include <chrono>
+#include <iostream>
 
 int main(int argc, char *argv[])
 {
     std::string filename = (argc > 1) ? argv[1] : "a280.tsp";
     TSPReader reader;
 
-    if (!reader.readFile(filename))
-    {
+    if (!reader.readFile(filename)) {
         std::cerr << "Failed to read TSP file." << std::endl;
         return 1;
     }
