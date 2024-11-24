@@ -2,12 +2,24 @@
 #define TSP_SOLVER_H
 
 #include "reader.h"
-#include <vector>
 #include <cmath>
+#include <vector>
 
-class TSPSolver
-{
-private:
+class TSPSolver {
+  protected:
+    // data
+    std::vector<Point> points;
+    double totalDistance;
+
+    // functions
+    double calculateDistance(const Point &p1, const Point &p2) const;
+
+  public:
+    TSPSolver(const std::vector<Point> &pts) : points(pts), totalDistance(0) {}
+};
+
+class TSPAlgorithm {
+  private:
     std::vector<Point> points;
     std::vector<int> currentTour;
     double totalDistance;
@@ -19,8 +31,8 @@ private:
     double calculateTourDistance(const std::vector<int> &tour) const;
     void reverse(std::vector<int> &tour, int start, int end);
 
-public:
-    TSPSolver(const std::vector<Point> &pts) : points(pts), totalDistance(0) {}
+  public:
+    TSPAlgorithm(const std::vector<Point> &pts) : points(pts), totalDistance(0) {}
 
     // Main solving methods
     void solveNearestNeighbor();
