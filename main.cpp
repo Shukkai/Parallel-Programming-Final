@@ -15,11 +15,11 @@ int main(int argc, char *argv[])
     }
 
     // Print the original data
-    reader.printData();
+    // reader.printData();
 
     ACO solver(reader.getPoints());
     solver.solve();
-    std::cout << solver.getDistance() << std::endl;
+    solver.printTour();
 
     // // Solve TSP
     // std::cout << "\nSolving TSP..." << std::endl;

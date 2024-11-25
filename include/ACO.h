@@ -3,41 +3,53 @@
 
 #include "reader.h"
 #include "solver.h"
+#include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
+#include <random>
 #include <vector>
 
 class ACO : public TSPSolver {
   private:
     // parameters
-    const int NUM_ANTS = 50;
-    const int NUM_ITERATIONS = 500;
+    const int NUM_ANTS = 100;
+    const int NUM_ITERATIONS = 100;
     const double ALPHA = 1.0;
     const double BETA = 2.0;
     const double RHO = 0.2;
     const double Q = 1.0;
 
+    // data
+    double pheromoneMax, pheromoneMin;
     int numCities;
-
     std::vector<std::vector<double>> pheromones;
     std::vector<int> bestTour;
+
+    // rng
+    std::random_device rd;
+    std::mt19937 gen;
+    std::uniform_real_distribution<double> uniform_dist;
 
     // functions
     int selectNextCity(int current, const std::vector<bool> &visited);
     void updatePheromones(const std::vector<std::vector<int>> &allTours, const std::vector<double> &tourLengths);
+    std::vector<int> contructSolution();
+    void _2Opt(std::vector<int> &tour);
+    void reverse(std::vector<int> &tour, int start, int end);
+    bool improve2Opt(std::vector<int> &tour);
 
   public:
     ACO(const std::vector<Point> &pts) : TSPSolver(pts)
     {
         numCities = points.size();
         pheromones.resize(numCities, std::vector<double>(numCities, 1.0));
-        std::cout << "ACO constructor" << std::endl;
+        gen = std::mt19937(rd());
+        uniform_dist = std::uniform_real_distribution<double>(0.0, 1.0);
     }
 
     // Main solving method
     void solve();
-
-    double getDistance() { return totalDistance; }
 };
 
 #endif

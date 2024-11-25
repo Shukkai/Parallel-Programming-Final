@@ -13,9 +13,12 @@ class TSPSolver {
 
     // functions
     double calculateDistance(const Point &p1, const Point &p2) const;
+    double calculateTourDistance(const std::vector<int> &tour) const;
 
   public:
     TSPSolver(const std::vector<Point> &pts) : points(pts), totalDistance(0) {}
+    double getDistance() { return totalDistance; }
+    void printTour() const;
 };
 
 class TSPAlgorithm {

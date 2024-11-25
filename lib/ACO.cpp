@@ -3,23 +3,21 @@
 int ACO::selectNextCity(int current, const std::vector<bool> &visited)
 {
     std::vector<double> probabilities(numCities, 0.0);
-    double sum = 0.0;
+    double totalProb = 0.0;
 
-    for (int i = 0; i < numCities; i++) {
-        if (!visited[i]) {
-            probabilities[i] = std::pow(pheromones[current][i], ALPHA) *
-                               std::pow(1.0 / calculateDistance(points[current], points[i]), BETA);
-            sum += probabilities[i];
+    for (int nextCity = 0; nextCity < numCities; nextCity++) {
+        if (!visited[nextCity]) {
+            probabilities[nextCity] = std::pow(pheromones[current][nextCity], ALPHA) *
+                                      std::pow(1.0 / calculateDistance(points[current], points[nextCity]), BETA);
+            totalProb += probabilities[nextCity];
         }
     }
 
-    double r = static_cast<double>(rand()) / RAND_MAX * sum;
-    double total = 0.0;
-
+    double r = uniform_dist(gen) * totalProb;
     for (int i = 0; i < numCities; i++) {
         if (!visited[i]) {
-            total += probabilities[i];
-            if (total >= r) {
+            r -= probabilities[i];
+            if (r <= 0) {
                 return i;
             }
         }
@@ -40,6 +38,7 @@ void ACO::updatePheromones(const std::vector<std::vector<int>> &allTours, const 
     for (int i = 0; i < numCities; i++) {
         for (int j = 0; j < numCities; j++) {
             pheromones[i][j] *= (1.0 - RHO);
+            pheromones[i][j] = std::clamp(pheromones[i][j], pheromoneMin, pheromoneMax);
         }
     }
 
@@ -62,30 +61,38 @@ void ACO::updatePheromones(const std::vector<std::vector<int>> &allTours, const 
     }
 }
 
+std::vector<int> ACO::contructSolution()
+{
+    std::vector<bool> visited(numCities, false);
+    std::vector<int> tour;
+    tour.reserve(numCities);
+
+    int current = std::uniform_int_distribution<int>(0, numCities - 1)(gen);
+    tour.push_back(current);
+    visited[current] = true;
+
+    for (int i = 1; i < numCities; i++) {
+        int next = selectNextCity(current, visited);
+        tour.push_back(next);
+        visited[next] = true;
+        current = next;
+    }
+
+    // 2-opt
+    _2Opt(tour);
+
+    return tour;
+}
+
 void ACO::solve()
 {
-    srand(time(0));
-
     for (int iter = 0; iter < NUM_ITERATIONS; iter++) {
         std::vector<std::vector<int>> allTours(NUM_ANTS);
         std::vector<double> tourLengths(NUM_ANTS, 0.0);
 
         for (int ant = 0; ant < NUM_ANTS; ant++) {
-            std::vector<bool> visited(numCities, false);
-            int currentCity = rand() % numCities;
-            allTours[ant].push_back(currentCity);
-            visited[currentCity] = true;
-
-            for (int step = 1; step < numCities; step++) {
-                int nextCity = selectNextCity(currentCity, visited);
-                allTours[ant].push_back(nextCity);
-                visited[nextCity] = true;
-                tourLengths[ant] += calculateDistance(points[currentCity], points[nextCity]);
-                currentCity = nextCity;
-            }
-
-            // Add return to start
-            tourLengths[ant] += calculateDistance(points[allTours[ant][numCities - 1]], points[allTours[ant][0]]);
+            allTours[ant] = contructSolution();
+            tourLengths[ant] = calculateTourDistance(allTours[ant]);
 
             if (totalDistance == 0 || tourLengths[ant] < totalDistance) {
                 bestTour = allTours[ant];
@@ -94,6 +101,47 @@ void ACO::solve()
             }
         }
 
+        pheromoneMax = 1.0 / (RHO * totalDistance);
+        pheromoneMin = pheromoneMax / (2 * numCities);
         updatePheromones(allTours, tourLengths);
     }
+}
+
+void ACO::_2Opt(std::vector<int> &tour)
+{
+    while (improve2Opt(tour)) {
+        // Continue until no more improvements can be made
+    }
+}
+
+void ACO::reverse(std::vector<int> &tour, int start, int end)
+{
+    while (start < end) {
+        std::swap(tour[start], tour[end]);
+        start++;
+        end--;
+    }
+}
+
+bool ACO::improve2Opt(std::vector<int> &tour)
+{
+    int n = tour.size() - 1; // Don't include last city
+    bool improved = false;
+
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            double beforeDistance = calculateDistance(points[tour[i]], points[tour[i + 1]]) +
+                                    calculateDistance(points[tour[j]], points[tour[(j + 1)]]);
+
+            double afterDistance = calculateDistance(points[tour[i]], points[tour[j]]) +
+                                   calculateDistance(points[tour[i + 1]], points[tour[(j + 1)]]);
+
+            if (afterDistance < beforeDistance) {
+                reverse(tour, i + 1, j);
+                // distance = calculateTourDistance(tour);
+                improved = true;
+            }
+        }
+    }
+    return improved;
 }
