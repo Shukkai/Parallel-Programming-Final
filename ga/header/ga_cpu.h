@@ -25,6 +25,7 @@ private:
     std::vector<int> selectParent();
     std::vector<int> crossover(const std::vector<int> &parent1, const std::vector<int> &parent2);
     void mutate(std::vector<int> &path);
+    void improve2Opt(std::vector<int> &tour);
 
 public:
     GeneticTSP(int popSize = 100, int gens = 1000, double mutRate = 0.01, double crossRate = 0.8);

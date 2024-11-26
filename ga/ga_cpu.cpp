@@ -8,6 +8,69 @@
 #include <string>
 #include <cmath>
 
+GeneticTSP::GeneticTSP(int popSize, int gens, double mutRate, double crossRate)
+    : populationSize(popSize), numGenerations(gens), mutationRate(mutRate), crossoverRate(crossRate)
+{
+    srand(time(nullptr));
+}
+
+bool GeneticTSP::readfile(const std::string &filename)
+{
+    std::ifstream file(filename);
+    if (!file.is_open())
+    {
+        std::cerr << "Error: Could not open file " << filename << std::endl;
+        return false;
+    }
+
+    std::string line;
+    bool reading_coords = false;
+
+    while (std::getline(file, line))
+    {
+        if (reading_coords)
+        {
+            std::istringstream iss(line);
+            City c;
+            if (iss >> c.id >> c.x >> c.y)
+            {
+                cities.push_back(c);
+            }
+        }
+        else
+        {
+            // if (line.find("NAME") != std::string::npos)
+            // {
+            //     name = line.substr(line.find(":") + 1);
+            //     name = name.substr(name.find_first_not_of(" \t"));
+            // }
+            // else if (line.find("COMMENT") != std::string::npos)
+            // {
+            //     comment = line.substr(line.find(":") + 1);
+            // }
+            // else if (line.find("TYPE") != std::string::npos)
+            // {
+            //     type = line.substr(line.find(":") + 1);
+            // }
+            // else if (line.find("DIMENSION") != std::string::npos)
+            // {
+            //     dimension = std::stoi(line.substr(line.find(":") + 1));
+            // }
+            // else if (line.find("EDGE_WEIGHT_TYPE") != std::string::npos)
+            // {
+            //     edge_weight_type = line.substr(line.find(":") + 1);
+            // }
+            if (line.find("NODE_COORD_SECTION") != std::string::npos)
+            {
+                reading_coords = true;
+            }
+        }
+    }
+
+    file.close();
+    return true;
+}
+
 double GeneticTSP::distance(const City &c1, const City &c2)
 {
     int dx = c1.x - c2.x;
@@ -89,67 +152,31 @@ void GeneticTSP::mutate(std::vector<int> &path)
     }
 }
 
-GeneticTSP::GeneticTSP(int popSize, int gens, double mutRate, double crossRate)
-    : populationSize(popSize), numGenerations(gens), mutationRate(mutRate), crossoverRate(crossRate)
+void GeneticTSP::improve2Opt(std::vector<int> &tour)
 {
-    srand(time(nullptr));
-}
+    // double distance = calculateFitness(tour);
+    int n = tour.size() - 1;
+    bool improved = false;
 
-bool GeneticTSP::readfile(const std::string &filename)
-{
-    std::ifstream file(filename);
-    if (!file.is_open())
+    for (int i = 0; i < n - 1; i++)
     {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
-        return false;
-    }
-
-    std::string line;
-    bool reading_coords = false;
-
-    while (std::getline(file, line))
-    {
-        if (reading_coords)
+        for (int j = i + 1; j < n; j++)
         {
-            std::istringstream iss(line);
-            City c;
-            if (iss >> c.id >> c.x >> c.y)
+            double beforeDistance =
+                distance(cities[tour[i]], cities[tour[i + 1]]) +
+                distance(cities[tour[j]], cities[tour[(j + 1)]]);
+
+            double afterDistance =
+                distance(cities[tour[i]], cities[tour[j]]) +
+                distance(cities[tour[i + 1]], cities[tour[(j + 1)]]);
+
+            if (afterDistance < beforeDistance)
             {
-                cities.push_back(c);
-            }
-        }
-        else
-        {
-            // if (line.find("NAME") != std::string::npos)
-            // {
-            //     name = line.substr(line.find(":") + 1);
-            //     name = name.substr(name.find_first_not_of(" \t"));
-            // }
-            // else if (line.find("COMMENT") != std::string::npos)
-            // {
-            //     comment = line.substr(line.find(":") + 1);
-            // }
-            // else if (line.find("TYPE") != std::string::npos)
-            // {
-            //     type = line.substr(line.find(":") + 1);
-            // }
-            // else if (line.find("DIMENSION") != std::string::npos)
-            // {
-            //     dimension = std::stoi(line.substr(line.find(":") + 1));
-            // }
-            // else if (line.find("EDGE_WEIGHT_TYPE") != std::string::npos)
-            // {
-            //     edge_weight_type = line.substr(line.find(":") + 1);
-            // }
-            if (line.find("NODE_COORD_SECTION") != std::string::npos)
-            {
-                reading_coords = true;
+                std::reverse(tour.begin() + i + 1, tour.begin() + j + 1);
+                return;
             }
         }
     }
-
-    file.close();
-    return true;
 }
 
 std::vector<int> GeneticTSP::solve()
@@ -178,6 +205,9 @@ std::vector<int> GeneticTSP::solve()
             std::vector<int> parent2 = selectParent();
             std::vector<int> offspring = crossover(parent1, parent2);
             mutate(offspring);
+
+            improve2Opt(offspring);
+
             newPopulation.push_back(offspring);
 
             double distance = calculateFitness(offspring);
@@ -185,7 +215,6 @@ std::vector<int> GeneticTSP::solve()
             {
                 bestDistance = distance;
                 bestTour = offspring;
-                // std::cout << "Generation " << gen << ": New best distance = " << bestDistance << std::endl;
             }
         }
 
