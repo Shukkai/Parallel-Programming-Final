@@ -9,7 +9,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 
-    GeneticTSP ga(100, 200000, 0.5, 0.8);
+    GeneticTSP ga(100, 10000, 0.05, 0.8);
 
     // read file
     std::string filename = (argc > 1) ? argv[1] : "a280.tsp";
