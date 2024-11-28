@@ -11,7 +11,7 @@
 GeneticTSP::GeneticTSP(int popSize, int gens, double mutRate, double crossRate)
     : populationSize(popSize), numGenerations(gens), mutationRate(mutRate), crossoverRate(crossRate)
 {
-    srand(time(nullptr));
+    srand(42);
 }
 
 bool GeneticTSP::readfile(const std::string &filename)
@@ -185,8 +185,8 @@ std::vector<int> GeneticTSP::solve()
         std::vector<int> tour(cities.size());
         for (size_t j = 0; j < cities.size(); j++)
             tour[j] = j;
-        std::random_device rd;
-        std::mt19937 g(rd()); // Mersenne Twister pseudo-random generator
+        // std::random_device rd;
+        std::mt19937 g(42); // Mersenne Twister pseudo-random generator
 
         // Shuffle the array using std::shuffle
         std::shuffle(tour.begin(), tour.end(), g);
