@@ -73,8 +73,8 @@ bool GeneticTSP::readfile(const std::string &filename)
 
 double GeneticTSP::distance(const City &c1, const City &c2)
 {
-    int dx = c1.x - c2.x;
-    int dy = c1.y - c2.y;
+    double dx = c1.x - c2.x;
+    double dy = c1.y - c2.y;
     return sqrt(dx * dx + dy * dy);
 }
 
@@ -218,11 +218,12 @@ std::vector<int> GeneticTSP::solve()
             {
                 bestDistance = distance;
                 bestTour = offspring;
+                std::cout << "\nGen = "<<gen<< " Best distance = " << bestDistance;
             }
         }
 
         population = newPopulation;
     }
-    std::cout << "Best distance = " << bestDistance;
+    std::cout << "\nBest distance = " << bestDistance<<std::endl;
     return bestTour;
 }
