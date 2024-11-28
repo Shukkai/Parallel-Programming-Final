@@ -1,5 +1,5 @@
 // ga.cpp
-#include "header/ga_cpu.h"
+#include "ga_cpu.h"
 #include <random>
 #include <algorithm>
 #include <ctime>
@@ -156,8 +156,6 @@ void GeneticTSP::improve2Opt(std::vector<int> &tour)
 {
     // double distance = calculateFitness(tour);
     int n = tour.size() - 1;
-    bool improved = false;
-
     for (int i = 0; i < n - 1; i++)
     {
         for (int j = i + 1; j < n; j++)
@@ -187,7 +185,12 @@ std::vector<int> GeneticTSP::solve()
         std::vector<int> tour(cities.size());
         for (size_t j = 0; j < cities.size(); j++)
             tour[j] = j;
-        std::random_shuffle(tour.begin(), tour.end());
+        std::random_device rd;
+        std::mt19937 g(rd()); // Mersenne Twister pseudo-random generator
+
+        // Shuffle the array using std::shuffle
+        std::shuffle(tour.begin(), tour.end(), g);
+        // std::random_shuffle(tour.begin(), tour.end());
         population.push_back(tour);
     }
 
@@ -199,7 +202,7 @@ std::vector<int> GeneticTSP::solve()
     {
         std::vector<std::vector<int>> newPopulation;
 
-        while (newPopulation.size() < populationSize)
+        while ((int)newPopulation.size() < populationSize)
         {
             std::vector<int> parent1 = selectParent();
             std::vector<int> parent2 = selectParent();

@@ -1,6 +1,6 @@
 # Compiler settings
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++17 -O3 -Iinclude
+CXXFLAGS = -Wall -Wextra -std=c++11 -O3 -Iinclude
 
 # Directories
 LIB_DIR = lib
@@ -13,6 +13,7 @@ OBJECTS = $(patsubst $(LIB_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(wildcard $(LIB_DIR)/*.c
 
 # Default input file
 INPUT_FILE ?= tsp_graph/a280.tsp
+INPUT_TYPE ?= aco
 
 # Main target
 all: $(OBJECTS)
@@ -27,11 +28,12 @@ $(BUILD_DIR)/%.o: $(LIB_DIR)/%.cpp
 
 # Run the program with input file
 run: all
-	./$(TARGET) $(INPUT_FILE)
+	./$(TARGET) $(INPUT_FILE) $(INPUT_TYPE)
 
 # Clean built files
 clean:
 	rm -rf $(BUILD_DIR) $(TARGET)
+
 
 # Help target
 help:
