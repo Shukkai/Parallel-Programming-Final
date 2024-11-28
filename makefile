@@ -12,8 +12,8 @@ TARGET = tsp
 OBJECTS = $(patsubst $(LIB_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(wildcard $(LIB_DIR)/*.cpp)) $(BUILD_DIR)/main.o
 
 # Default input file
-INPUT_FILE ?= tsp_graph/a280.tsp
-INPUT_TYPE ?= aco
+INPUT_FILE ?= tsp_graph/ch130.tsp
+INPUT_TYPE ?= ga
 
 # Main target
 all: $(OBJECTS)

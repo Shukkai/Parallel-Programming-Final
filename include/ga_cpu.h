@@ -7,7 +7,7 @@
 #include <sstream>
 struct City
 {
-    int id, x, y;
+    double id, x, y;
 };
 
 class GeneticTSP
