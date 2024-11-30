@@ -11,6 +11,28 @@ double TSPSolver::calculateDistance(const Point &p1, const Point &p2) const
     return std::sqrt(dx * dx + dy * dy);
 }
 
+double TSPSolver::calculateTourDistance(const std::vector<int> &tour) const
+{
+    double distance = 0;
+    for (size_t i = 0; i < tour.size() - 1; ++i) {
+        distance += calculateDistance(points[tour[i]], points[tour[i + 1]]);
+    }
+    distance += calculateDistance(points[tour.back()], points[tour.front()]);
+    return distance;
+}
+
+void TSPSolver::printTour() const
+{
+    // std::cout << "\nTour path:" << std::endl;
+    // for (size_t i = 0; i < bestTour.size(); ++i) {
+    //     std::cout << points[bestTour[i]].id;
+    //     if (i < bestTour.size() - 1) {
+    //         std::cout << " -> ";
+    //     }
+    // }
+    std::cout << "\nTotal distance: " << totalDistance << std::endl;
+}
+
 // int TSPAlgorithm::findNearestNeighbor(int currentCity, const std::vector<bool> &visited) const
 // {
 //     double minDistance = std::numeric_limits<double>::max();
