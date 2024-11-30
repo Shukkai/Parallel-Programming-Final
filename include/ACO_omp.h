@@ -4,15 +4,7 @@
 #include "ACO.h"
 #include "reader.h"
 #include "solver.h"
-#include <algorithm>
-#include <atomic>
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
 #include <omp.h>
-#include <random>
-#include <thread>
-#include <vector>
 
 class ACOOmp : public ACO {
   private:

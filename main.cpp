@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 {
     std::string filename = (argc > 0) ? argv[1] : "a280.tsp";
     std::string type = (argc > 1) ? argv[2] : "aco";
-    std::string parallel = (argc > 2) ? argv[3] : "none";
+    std::string parallel = (argc > 2) ? argv[3] : "serial";
 
     TSPReader reader;
     if (!reader.readFile(filename)) {

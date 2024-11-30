@@ -3,6 +3,7 @@
 
 #include "reader.h"
 #include <cmath>
+#include <limits>
 #include <vector>
 
 class TSPSolver {
@@ -16,7 +17,7 @@ class TSPSolver {
     double calculateTourDistance(const std::vector<int> &tour) const;
 
   public:
-    TSPSolver(const std::vector<Point> &pts) : points(pts), totalDistance(0) {}
+    TSPSolver(const std::vector<Point> &pts) : points(pts), totalDistance(std::numeric_limits<double>::infinity()) {}
     double getDistance() { return totalDistance; }
     void printTour() const;
 };
