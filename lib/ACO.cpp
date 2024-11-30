@@ -38,7 +38,7 @@ void ACO::updatePheromones(const std::vector<std::vector<int>> &allTours, const 
     for (int i = 0; i < numCities; i++) {
         for (int j = 0; j < numCities; j++) {
             pheromones[i][j] *= (1.0 - RHO);
-            pheromones[i][j] = std::clamp(pheromones[i][j], pheromoneMin, pheromoneMax);
+            // pheromones[i][j] = std::clamp(pheromones[i][j], pheromoneMin, pheromoneMax);
         }
     }
 
@@ -97,7 +97,7 @@ void ACO::solve()
             if (totalDistance == 0 || tourLengths[ant] < totalDistance) {
                 bestTour = allTours[ant];
                 totalDistance = tourLengths[ant];
-                std::cout << "Iteration " << iter << ": Best tour length = " << totalDistance << std::endl;
+                // std::cout << "Iteration " << iter << ": Best tour length = " << totalDistance << std::endl;
             }
         }
 

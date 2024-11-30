@@ -50,6 +50,7 @@ class ACO : public TSPSolver {
 
     // Main solving method
     void solve();
+    const std::vector<int> &getTour() const { return bestTour; }
 };
 
 #endif
