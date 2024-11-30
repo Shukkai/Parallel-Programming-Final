@@ -1,6 +1,6 @@
 # Compiler settings
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++17 -O3 -Iinclude
+CXXFLAGS = -Wall -Wextra -std=c++17 -O3 -Iinclude -fopenmp
 
 # Directories
 LIB_DIR = lib
@@ -12,8 +12,9 @@ TARGET = tsp
 OBJECTS = $(patsubst $(LIB_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(wildcard $(LIB_DIR)/*.cpp)) $(BUILD_DIR)/main.o
 
 # Default input file
-INPUT_FILE ?= tsp_graph/ch130.tsp
-INPUT_TYPE ?= ga
+testcase ?= tsp_graph/ch130.tsp
+algo ?= ga			# ga, aco
+parallel ?= serial	# serial, omp, thread
 
 # Main target
 all: $(OBJECTS)
@@ -28,7 +29,7 @@ $(BUILD_DIR)/%.o: $(LIB_DIR)/%.cpp
 
 # Run the program with input file
 run: all
-	./$(TARGET) $(INPUT_FILE) $(INPUT_TYPE)
+	./$(TARGET) $(testcase) $(algo) $(parallel)
 
 # Clean built files
 clean:

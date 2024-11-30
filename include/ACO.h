@@ -20,8 +20,9 @@ class ACO : public TSPSolver {
     const double RHO = 0.2;
     const double Q = 1.0;
 
+  protected:
     // data
-    double pheromoneMax, pheromoneMin;
+    double tau_max, tau_min;
     int numCities;
     std::vector<std::vector<double>> pheromones;
     std::vector<int> bestTour;
