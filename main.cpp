@@ -5,6 +5,7 @@
 #include "reader.h"
 #include "solver.h"
 #include <chrono>
+#include "ga_omp.h"
 
 enum parallel_type { SERIAL, OMP, THREAD, CUDA };
 
@@ -67,9 +68,14 @@ int main(int argc, char *argv[])
     else if (type == "ga") {
         // Solve TSP
         auto start = std::chrono::high_resolution_clock::now();
-
-        GeneticTSP ga(reader.getPoints(), 100, 10000, 0.05, 0.8);
-        std::pair<std::vector<int>, double> result = ga.solve();
+        if(parallel == "omp"){
+            ga_omp gaomp(reader.getPoints(), 100, 10000, 0.05, 0.8);
+            std::pair<std::vector<int>,double> result = ga_omp.solve();
+        }
+        else{
+            GeneticTSP ga(reader.getPoints(), 100, 10000, 0.05, 0.8);
+            std::pair<std::vector<int>, double> result = ga.solve();
+        }
 
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
