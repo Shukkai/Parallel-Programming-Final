@@ -1,11 +1,10 @@
 #include "ACO.h"
 #include "ACO_omp.h"
+#include "ACO_thread.h"
 #include "ga_cpu.h"
 #include "reader.h"
 #include "solver.h"
 #include <chrono>
-#include <fstream>
-#include <iostream>
 
 enum parallel_type { SERIAL, OMP, THREAD, CUDA };
 
@@ -26,7 +25,7 @@ int main(int argc, char *argv[])
 {
     std::string filename = (argc > 0) ? argv[1] : "a280.tsp";
     std::string type = (argc > 1) ? argv[2] : "aco";
-    std::string parallel = (argc > 2) ? argv[3] : "none";
+    std::string parallel = (argc > 2) ? argv[3] : "serial";
 
     TSPReader reader;
     if (!reader.readFile(filename)) {
@@ -43,6 +42,12 @@ int main(int argc, char *argv[])
 
         if (parallel == "omp") {
             ACOOmp solver(reader.getPoints());
+            solver.solve();
+            bestTour = solver.getTour();
+            bestDistance = solver.getDistance();
+        }
+        else if (parallel == "thread") {
+            ACOThread solver(reader.getPoints(), 4);
             solver.solve();
             bestTour = solver.getTour();
             bestDistance = solver.getDistance();

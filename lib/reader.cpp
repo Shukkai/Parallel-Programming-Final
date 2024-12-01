@@ -1,7 +1,4 @@
 #include "reader.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
 
 bool TSPReader::readFile(const std::string &filename)
 {

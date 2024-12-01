@@ -1,6 +1,6 @@
 # Compiler settings
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++17 -O3 -Iinclude -fopenmp
+CXXFLAGS = -Wall -Wextra -std=c++17 -O3 -Iinclude -fopenmp -pthread
 
 # Directories
 LIB_DIR = lib

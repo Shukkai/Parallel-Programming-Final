@@ -26,6 +26,7 @@ class ACO : public TSPSolver {
     int numCities;
     std::vector<std::vector<double>> pheromones;
     std::vector<int> bestTour;
+    double globalBestDistance = std::numeric_limits<double>::infinity();
 
     // rng
     std::random_device rd;
@@ -34,7 +35,7 @@ class ACO : public TSPSolver {
 
     // functions
     int selectNextCity(int current, const std::vector<bool> &visited);
-    void updatePheromones(const std::vector<std::vector<int>> &allTours, const std::vector<double> &tourLengths);
+    void updatePheromones(const std::vector<int> &allTours);
     std::vector<int> contructSolution();
     void _2Opt(std::vector<int> &tour);
     void reverse(std::vector<int> &tour, int start, int end);
@@ -45,8 +46,8 @@ class ACO : public TSPSolver {
     {
         numCities = points.size();
         pheromones.resize(numCities, std::vector<double>(numCities, 1.0));
-        gen = std::mt19937(rd());
-        uniform_dist = std::uniform_real_distribution<double>(0.0, 1.0);
+        gen = std::mt19937(42);
+        // uniform_dist = std::uniform_real_distribution<double>(0.0, numCities - 1);
     }
 
     // Main solving method

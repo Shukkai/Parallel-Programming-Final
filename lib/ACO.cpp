@@ -32,33 +32,33 @@ int ACO::selectNextCity(int current, const std::vector<bool> &visited)
     return -1;
 }
 
-void ACO::updatePheromones(const std::vector<std::vector<int>> &allTours, const std::vector<double> &tourLengths)
+void ACO::updatePheromones(const std::vector<int> &allTours)
 {
     // evaporation
     for (int i = 0; i < numCities; i++) {
         for (int j = 0; j < numCities; j++) {
             pheromones[i][j] *= (1.0 - RHO);
-            pheromones[i][j] = std::clamp(pheromones[i][j], tau_min, tau_max);
         }
     }
 
-    // deposit
-    for (int i = 0; i < NUM_ANTS; i++) {
-        double contribution = Q / tourLengths[i];
-        int city1, city2;
-        for (int j = 0; j < numCities - 1; j++) {
-            city1 = allTours[i][j];
-            city2 = allTours[i][j + 1];
-            pheromones[city1][city2] += contribution;
-            pheromones[city2][city1] += contribution;
-        }
-
-        // Add return to start
-        city1 = allTours[i][numCities - 1];
-        city2 = allTours[i][0];
-        pheromones[city1][city2] += contribution;
-        pheromones[city2][city1] += contribution;
+    int city1, city2;
+    double deposit = 1.0 / globalBestDistance;
+    for (int i = 0; i < numCities - 1; i++) {
+        city1 = allTours[i];
+        city2 = allTours[i + 1];
+        pheromones[city1][city2] += deposit;
+        pheromones[city2][city1] += deposit;
+        pheromones[city1][city2] = std::clamp(pheromones[city1][city2], tau_min, tau_max);
+        pheromones[city2][city1] = std::clamp(pheromones[city2][city1], tau_min, tau_max);
     }
+
+    // Add return to start
+    city1 = allTours[numCities - 1];
+    city2 = allTours[0];
+    pheromones[city1][city2] += deposit;
+    pheromones[city2][city1] += deposit;
+    pheromones[city1][city2] = std::clamp(pheromones[city1][city2], tau_min, tau_max);
+    pheromones[city2][city1] = std::clamp(pheromones[city2][city1], tau_min, tau_max);
 }
 
 std::vector<int> ACO::contructSolution()
@@ -115,7 +115,6 @@ bool ACO::improve2Opt(std::vector<int> &tour)
 
             if (afterDistance < beforeDistance) {
                 reverse(tour, i + 1, j);
-                // distance = calculateTourDistance(tour);
                 improved = true;
             }
         }
@@ -126,24 +125,26 @@ bool ACO::improve2Opt(std::vector<int> &tour)
 void ACO::solve()
 {
     for (int iter = 0; iter < NUM_ITERATIONS; iter++) {
-        std::vector<std::vector<int>> allTours(NUM_ANTS);
-        std::vector<double> tourLengths(NUM_ANTS, 0.0);
+        std::vector<int> tour;
+        double tourLength;
 
         for (int ant = 0; ant < NUM_ANTS; ant++) {
-            allTours[ant] = contructSolution();
-            tourLengths[ant] = calculateTourDistance(allTours[ant]);
+            tour = contructSolution();
+            tourLength = calculateTourDistance(tour);
 
-            if (totalDistance == 0 || tourLengths[ant] < totalDistance) {
-                bestTour = allTours[ant];
-                totalDistance = tourLengths[ant];
-                // std::cout << "Iteration " << iter << ": Best tour length = " << totalDistance << std::endl;
+            if (tourLength < globalBestDistance) {
+                bestTour = tour;
+                globalBestDistance = tourLength;
+                // std::cout << "Iteration " << iter << ": Best tour length = " << globalBestDistance << std::endl;
             }
         }
 
-        tau_max = 1.0 / (RHO * totalDistance);
+        tau_max = 1.0 / (RHO * globalBestDistance);
         tau_min =
             tau_max * (1.0 - std::pow(0.05, 1.0 / numCities)) / ((numCities / 2 - 1) * std::pow(0.05, 1.0 / numCities));
 
-        updatePheromones(allTours, tourLengths);
+        updatePheromones(bestTour);
     }
+
+    totalDistance = globalBestDistance;
 }
