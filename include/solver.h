@@ -3,6 +3,7 @@
 
 #include "reader.h"
 #include <cmath>
+#include <iostream>
 #include <limits>
 #include <vector>
 

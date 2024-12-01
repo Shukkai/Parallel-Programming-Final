@@ -1,8 +1,4 @@
 #include "solver.h"
-#include <algorithm>
-#include <cmath>
-#include <iostream>
-#include <limits>
 
 double TSPSolver::calculateDistance(const Point &p1, const Point &p2) const
 {

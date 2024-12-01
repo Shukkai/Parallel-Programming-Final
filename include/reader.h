@@ -1,19 +1,20 @@
 #ifndef TSP_READER_H
 #define TSP_READER_H
 
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
-struct Point
-{
+struct Point {
     int id;
     double x;
     double y;
 };
 
-class TSPReader
-{
-private:
+class TSPReader {
+  private:
     std::string name;
     std::string comment;
     std::string type;
@@ -21,7 +22,7 @@ private:
     std::string edge_weight_type;
     std::vector<Point> points;
 
-public:
+  public:
     bool readFile(const std::string &filename);
     void printData() const;
     const std::vector<Point> &getPoints() const;
