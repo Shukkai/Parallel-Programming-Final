@@ -14,7 +14,7 @@ OBJECTS = $(patsubst $(LIB_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(wildcard $(LIB_DIR)/*.c
 # Default input file
 testcase ?= tsp_graph/a280.tsp
 algo ?= ga			# ga, aco
-parallel ?= omp	# serial, omp, thread
+parallel ?= thread	# serial, omp, thread
 
 # Main target
 all: $(OBJECTS)

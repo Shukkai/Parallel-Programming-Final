@@ -6,6 +6,7 @@
 #include "solver.h"
 #include <chrono>
 #include "ga_omp.h"
+#include "ga_thread.h"
 
 enum parallel_type
 {
@@ -85,6 +86,12 @@ int main(int argc, char *argv[])
             ga_omp gaomp(reader.getPoints(), 100, 10000, 0.05, 0.8);
             start = std::chrono::high_resolution_clock::now();
             result = gaomp.solve();
+        }
+        else if (parallel == "thread")
+        {
+            ga_thread gathread(reader.getPoints(), 100, 10000, 0.05, 0.8, 16);
+            start = std::chrono::high_resolution_clock::now();
+            result = gathread.solve();
         }
         else
         {
