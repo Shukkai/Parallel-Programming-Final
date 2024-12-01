@@ -1,10 +1,15 @@
 #ifndef GA_OMP_H
 #define GA_OMP_H
-#include "ga_cpu.h"
-#include <omp.h>
-class ga_omp :public GeneticTSP
+
+#include "reader.h"
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+class ga_omp
 {
-private:
+protected:
     std::vector<Point> cities;
     std::vector<std::vector<int>> population;
     int populationSize;
@@ -21,7 +26,8 @@ private:
 
 public:
     ga_omp(const std::vector<Point> &pts, int popSize = 100, int gens = 1000, double mutRate = 0.01,
-               double crossRate = 0.8);
+           double crossRate = 0.8);
+
     std::pair<std::vector<int>, double> solve();
 };
 

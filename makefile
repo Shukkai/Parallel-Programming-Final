@@ -12,9 +12,9 @@ TARGET = tsp
 OBJECTS = $(patsubst $(LIB_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(wildcard $(LIB_DIR)/*.cpp)) $(BUILD_DIR)/main.o
 
 # Default input file
-testcase ?= tsp_graph/ch130.tsp
+testcase ?= tsp_graph/a280.tsp
 algo ?= ga			# ga, aco
-parallel ?= serial	# serial, omp, thread
+parallel ?= omp	# serial, omp, thread
 
 # Main target
 all: $(OBJECTS)

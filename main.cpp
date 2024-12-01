@@ -7,7 +7,13 @@
 #include <chrono>
 #include "ga_omp.h"
 
-enum parallel_type { SERIAL, OMP, THREAD, CUDA };
+enum parallel_type
+{
+    SERIAL,
+    OMP,
+    THREAD,
+    CUDA
+};
 
 inline int hashit(std::string const &inString)
 {
@@ -27,9 +33,9 @@ int main(int argc, char *argv[])
     std::string filename = (argc > 0) ? argv[1] : "a280.tsp";
     std::string type = (argc > 1) ? argv[2] : "aco";
     std::string parallel = (argc > 2) ? argv[3] : "serial";
-
     TSPReader reader;
-    if (!reader.readFile(filename)) {
+    if (!reader.readFile(filename))
+    {
         std::cerr << "Failed to read TSP file." << std::endl;
         return 1;
     }
@@ -38,22 +44,26 @@ int main(int argc, char *argv[])
     double bestDistance = 0.0, elapsedTime = 0.0;
     std::cout << "Solving TSP...\n";
 
-    if (type == "aco") {
+    if (type == "aco")
+    {
         auto start = std::chrono::high_resolution_clock::now();
 
-        if (parallel == "omp") {
+        if (parallel == "omp")
+        {
             ACOOmp solver(reader.getPoints());
             solver.solve();
             bestTour = solver.getTour();
             bestDistance = solver.getDistance();
         }
-        else if (parallel == "thread") {
+        else if (parallel == "thread")
+        {
             ACOThread solver(reader.getPoints(), 4);
             solver.solve();
             bestTour = solver.getTour();
             bestDistance = solver.getDistance();
         }
-        else {
+        else
+        {
             ACO solver(reader.getPoints());
             solver.solve();
             bestTour = solver.getTour();
@@ -65,16 +75,22 @@ int main(int argc, char *argv[])
 
         elapsedTime = duration.count();
     }
-    else if (type == "ga") {
+    else if (type == "ga")
+    {
         // Solve TSP
         auto start = std::chrono::high_resolution_clock::now();
-        if(parallel == "omp"){
+        std::pair<std::vector<int>, double> result;
+        if (parallel == "omp")
+        {
             ga_omp gaomp(reader.getPoints(), 100, 10000, 0.05, 0.8);
-            std::pair<std::vector<int>,double> result = ga_omp.solve();
+            start = std::chrono::high_resolution_clock::now();
+            result = gaomp.solve();
         }
-        else{
+        else
+        {
             GeneticTSP ga(reader.getPoints(), 100, 10000, 0.05, 0.8);
-            std::pair<std::vector<int>, double> result = ga.solve();
+            start = std::chrono::high_resolution_clock::now();
+            result = ga.solve();
         }
 
         auto end = std::chrono::high_resolution_clock::now();
@@ -87,7 +103,8 @@ int main(int argc, char *argv[])
 
     // write results to file
     std::string res_fname = "res/" + type;
-    switch (hashit(parallel)) {
+    switch (hashit(parallel))
+    {
     case 1:
         res_fname += "_omp.txt";
         break;
@@ -108,7 +125,8 @@ int main(int argc, char *argv[])
     file << "Time taken: " << elapsedTime << " milliseconds\n";
     file << "Total distance: " << bestDistance << "\n";
     file << "Best tour found:\n";
-    for (int city : bestTour) {
+    for (int city : bestTour)
+    {
         file << city << "\n";
     }
 
