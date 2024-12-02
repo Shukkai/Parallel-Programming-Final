@@ -135,7 +135,7 @@ void ACO::solve()
             if (tourLength < globalBestDistance) {
                 bestTour = tour;
                 globalBestDistance = tourLength;
-                // std::cout << "Iteration " << iter << ": Best tour length = " << globalBestDistance << std::endl;
+                std::cout << "Iteration " << iter << ": Best tour length = " << globalBestDistance << std::endl;
             }
         }
 

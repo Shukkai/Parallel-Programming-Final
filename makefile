@@ -1,5 +1,5 @@
 # Compiler settings
-CXX = g++
+CXX = mpicxx
 CXXFLAGS = -Wall -Wextra -std=c++17 -O3 -Iinclude -fopenmp -pthread
 
 # Directories

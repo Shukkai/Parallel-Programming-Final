@@ -7,13 +7,15 @@
 #include <chrono>
 #include "ga_omp.h"
 #include "ga_thread.h"
+#include "ACO_mpi.h"
 
 enum parallel_type
 {
     SERIAL,
     OMP,
     THREAD,
-    CUDA
+    CUDA,
+    MPI_
 };
 
 inline int hashit(std::string const &inString)
@@ -26,6 +28,8 @@ inline int hashit(std::string const &inString)
         return THREAD;
     if (inString == "cuda")
         return CUDA;
+    if (inString == "mpi")
+        return MPI_;
     return SERIAL;
 }
 
@@ -62,6 +66,25 @@ int main(int argc, char *argv[])
             solver.solve();
             bestTour = solver.getTour();
             bestDistance = solver.getDistance();
+        }
+        else if (parallel == "mpi")
+        {
+            int rank, size;
+            MPI_Init(nullptr, nullptr);
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+            MPI_Comm_size(MPI_COMM_WORLD, &size);
+            std::cout << rank << " " << size << std::endl;
+
+            ACOMpi solver(reader.getPoints());
+            solver.solve();
+            bestTour = solver.getTour();
+            bestDistance = solver.getDistance();
+
+            MPI_Barrier(MPI_COMM_WORLD);
+            if (rank != 0) {
+                MPI_Finalize();
+                return 0;
+            }
         }
         else
         {
@@ -121,6 +144,9 @@ int main(int argc, char *argv[])
     case 3:
         res_fname += "_cuda.txt";
         break;
+    case 4:
+        res_fname += "_mpi.txt";
+        break;
     default:
         res_fname += ".txt";
         break;
@@ -139,5 +165,7 @@ int main(int argc, char *argv[])
 
     // print results to console
     std::cout << "Distance: " << bestDistance << "\nSolution found in " << elapsedTime << " milliseconds\n";
+    
+    MPI_Finalize();
     return 0;
 }
