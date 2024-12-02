@@ -8,6 +8,7 @@
 #include "ga_omp.h"
 #include "ga_thread.h"
 #include "ACO_mpi.h"
+#include "ga_mpi.h"
 
 enum parallel_type
 {
@@ -84,6 +85,8 @@ int main(int argc, char *argv[])
             if (rank != 0) {
                 MPI_Finalize();
                 return 0;
+            } else {
+                MPI_Finalize();
             }
         }
         else
@@ -112,9 +115,27 @@ int main(int argc, char *argv[])
         }
         else if (parallel == "thread")
         {
-            ga_thread gathread(reader.getPoints(), 100, 10000, 0.05, 0.8, 16);
+            ga_thread gathread(reader.getPoints(), 100, 10000, 0.05, 0.8, 64);
             start = std::chrono::high_resolution_clock::now();
             result = gathread.solve();
+        }
+        else if (parallel == "mpi") {
+            int rank, size;
+            MPI_Init(nullptr, nullptr);
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+            MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+            ga_mpi gampi(reader.getPoints(), 100, 10000, 0.05, 0.8);
+            start = std::chrono::high_resolution_clock::now();
+            result = gampi.solve();
+
+            MPI_Barrier(MPI_COMM_WORLD);
+            if (rank != 0) {
+                MPI_Finalize();
+                return 0;
+            } else {
+                MPI_Finalize();
+            }
         }
         else
         {
@@ -166,6 +187,5 @@ int main(int argc, char *argv[])
     // print results to console
     std::cout << "Distance: " << bestDistance << "\nSolution found in " << elapsedTime << " milliseconds\n";
     
-    MPI_Finalize();
     return 0;
 }

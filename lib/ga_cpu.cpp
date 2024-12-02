@@ -159,7 +159,7 @@ std::pair<std::vector<int>, double> GeneticTSP::solve()
             {
                 bestDistance = distance;
                 bestTour = offspring;
-                std::cout << "\nGen = " << gen << " Best distance = " << bestDistance;
+                // std::cout << "\nGen = " << gen << " Best distance = " << bestDistance;
             }
         }
 
