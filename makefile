@@ -52,7 +52,8 @@ help:
 # solver.o: solver.cpp header/solver.h header/reader.h
 
 cuda:
-	nvcc testc.cu -o test
+	nvcc aco.cu -o aco_cuda.out
+	./aco_cuda.out
 
 
 .PHONY: all clean run help
