@@ -33,7 +33,7 @@ run: all
 
 # Clean built files
 clean:
-	rm -rf $(BUILD_DIR) $(TARGET)
+	rm -rf $(BUILD_DIR) $(TARGET) *.out
 
 
 # Help target
@@ -52,8 +52,8 @@ help:
 # solver.o: solver.cpp header/solver.h header/reader.h
 
 cuda:
-	nvcc aco.cu -o aco_cuda.out
-	./aco_cuda.out
+	nvcc -lcurand -std=c++17 -O3 aco.cu -o aco_cuda.out
+	./aco_cuda.out $(testcase)
 
 
 .PHONY: all clean run help
