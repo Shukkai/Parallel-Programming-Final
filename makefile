@@ -51,4 +51,8 @@ help:
 # reader.o: reader.cpp header/reader.h
 # solver.o: solver.cpp header/solver.h header/reader.h
 
+cuda:
+	nvcc testc.cu -o test
+
+
 .PHONY: all clean run help
