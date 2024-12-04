@@ -1,0 +1,4 @@
+Testcase: tsp_graph/a280.tsp
+Time taken: 2865 milliseconds
+Total distance: 2766.62
+Best tour found:
