@@ -12,9 +12,10 @@ TARGET = tsp
 OBJECTS = $(patsubst $(LIB_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(wildcard $(LIB_DIR)/*.cpp)) $(BUILD_DIR)/main.o
 
 # Default input file
-testcase ?= tsp_graph/a280.tsp
+path ?= tsp_graph/
+testcase ?= a280.tsp
 algo ?= ga			# ga, aco
-parallel ?= thread	# serial, omp, thread
+parallel ?= serial	# serial, omp, thread
 
 # Main target
 all: $(OBJECTS)
@@ -29,7 +30,7 @@ $(BUILD_DIR)/%.o: $(LIB_DIR)/%.cpp
 
 # Run the program with input file
 run: all
-	./$(TARGET) $(testcase) $(algo) $(parallel)
+	./$(TARGET) $(path)$(testcase) $(algo) $(parallel)
 
 # Clean built files
 clean:

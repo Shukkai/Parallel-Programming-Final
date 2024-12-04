@@ -7,6 +7,7 @@
 #include <chrono>
 #include "ga_omp.h"
 #include "ga_thread.h"
+#include <string>
 
 enum parallel_type
 {
@@ -44,7 +45,7 @@ int main(int argc, char *argv[])
     std::vector<int> bestTour;
     double bestDistance = 0.0, elapsedTime = 0.0;
     std::cout << "Solving TSP...\n";
-
+    int thread_num = 8;
     if (type == "aco")
     {
         auto start = std::chrono::high_resolution_clock::now();
@@ -89,7 +90,7 @@ int main(int argc, char *argv[])
         }
         else if (parallel == "thread")
         {
-            ga_thread gathread(reader.getPoints(), 100, 10000, 0.05, 0.8, 16);
+            ga_thread gathread(reader.getPoints(), 100, 10000, 0.05, 0.8, thread_num);
             start = std::chrono::high_resolution_clock::now();
             result = gathread.solve();
         }
@@ -109,20 +110,20 @@ int main(int argc, char *argv[])
     }
 
     // write results to file
-    std::string res_fname = "res/" + type;
+    std::string res_fname = "res/" + filename + "_" + type;
     switch (hashit(parallel))
     {
     case 1:
         res_fname += "_omp.txt";
         break;
     case 2:
-        res_fname += "_thread.txt";
+        res_fname += "_thread_" + std::to_string(thread_num) + ".txt";
         break;
     case 3:
         res_fname += "_cuda.txt";
         break;
     default:
-        res_fname += ".txt";
+        res_fname += "_serial.txt";
         break;
     }
 
