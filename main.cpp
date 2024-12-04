@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
         }
         else if (parallel == "thread")
         {
-            ACOThread solver(reader.getPoints(), 4);
+            ACOThread solver(reader.getPoints(), 64);
             solver.solve();
             bestTour = solver.getTour();
             bestDistance = solver.getDistance();
@@ -90,7 +90,11 @@ int main(int argc, char *argv[])
         }
         else if (parallel == "thread")
         {
+<<<<<<< HEAD
             ga_thread gathread(reader.getPoints(), 100, 10000, 0.05, 0.8, thread_num);
+=======
+            ga_thread gathread(reader.getPoints(), 100, 10000, 0.05, 0.8, 64);
+>>>>>>> 29a43da7207be164d370feaaad26d7a343a8cc88
             start = std::chrono::high_resolution_clock::now();
             result = gathread.solve();
         }
