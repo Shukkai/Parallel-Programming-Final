@@ -13,7 +13,7 @@
 ga_thread::ga_thread(const std::vector<Point> &pts, int popSize, int gens, double mutRate, double crossRate, int numofthread)
     : cities(pts), populationSize(popSize), numGenerations(gens), mutationRate(mutRate), crossoverRate(crossRate), numofthread(numofthread)
 {
-    srand(time(nullptr));
+    // srand(time(nullptr));
 }
 
 double ga_thread::distance(const Point &c1, const Point &c2)
@@ -34,16 +34,19 @@ double ga_thread::calculateFitness(const std::vector<int> &path)
     return total;
 }
 
-std::vector<int> ga_thread::selectParent()
+std::vector<int> ga_thread::selectParent(std::mt19937 &rng)
 {
     int tournamentSize = 5;
+    std::uniform_int_distribution<> dist(0, population.size() - 1);
+
     std::vector<int> tournament(tournamentSize);
     double bestFitness = std::numeric_limits<double>::infinity();
     std::vector<int> bestPath;
 
     for (int i = 0; i < tournamentSize; i++)
     {
-        int idx = rand() % population.size();
+        // int idx = rand() % population.size();
+        int idx = dist(rng);
         double fitness = calculateFitness(population[idx]);
         if (fitness < bestFitness)
         {
@@ -54,17 +57,20 @@ std::vector<int> ga_thread::selectParent()
     return bestPath;
 }
 
-std::vector<int> ga_thread::crossover(const std::vector<int> &parent1, const std::vector<int> &parent2)
+std::vector<int> ga_thread::crossover(const std::vector<int> &parent1, const std::vector<int> &parent2, std::mt19937 &rng)
 {
-    if ((double)rand() / RAND_MAX > crossoverRate)
+    std::uniform_real_distribution<> dis_real(0.0, 1.0);
+    if (dis_real(rng) > crossoverRate)
     {
         return parent1;
     }
 
     int n = parent1.size();
     std::vector<int> child(n, -1);
-    int start = rand() % n;
-    int end = rand() % n;
+    std::uniform_int_distribution<> dist_int(0, n - 1);
+    int start = dist_int(rng);
+    int end = dist_int(rng);
+
     if (start > end)
         std::swap(start, end);
 
@@ -87,12 +93,14 @@ std::vector<int> ga_thread::crossover(const std::vector<int> &parent1, const std
     return child;
 }
 
-void ga_thread::mutate(std::vector<int> &path)
+void ga_thread::mutate(std::vector<int> &path, std::mt19937 &rng)
 {
-    if ((double)rand() / RAND_MAX < mutationRate)
+    std::uniform_real_distribution<> dis_real(0.0, 1.0);
+    if (dis_real(rng) < mutationRate)
     {
-        int i = rand() % path.size();
-        int j = rand() % path.size();
+        std::uniform_int_distribution<> dist_int(0, path.size() - 1);
+        int i = dist_int(rng);
+        int j = dist_int(rng);
         std::swap(path[i], path[j]);
     }
 }
@@ -143,16 +151,16 @@ std::pair<std::vector<int>, double> ga_thread::solve()
     auto processChunk = [&](int threadId, int startIdx, int endIdx, std::vector<std::vector<int>> &threadPopulation)
     {
         std::random_device rd;
-        std::mt19937 g(rd());
+        std::mt19937 rng(rd());
         std::vector<int> localBestTour;
         double localBestDistance = std::numeric_limits<double>::infinity();
 
         for (int i = startIdx; i < endIdx; i++)
         {
-            std::vector<int> parent1 = selectParent();
-            std::vector<int> parent2 = selectParent();
-            std::vector<int> offspring = crossover(parent1, parent2);
-            mutate(offspring);
+            std::vector<int> parent1 = selectParent(rng);
+            std::vector<int> parent2 = selectParent(rng);
+            std::vector<int> offspring = crossover(parent1, parent2, rng);
+            mutate(offspring, rng);
             improve2Opt(offspring);
 
             double distance = calculateFitness(offspring);

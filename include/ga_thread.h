@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#include <random>
 #include <limits>
 
 class ga_thread
@@ -22,9 +23,9 @@ protected:
 
     double distance(const Point &c1, const Point &c2);
     double calculateFitness(const std::vector<int> &path);
-    std::vector<int> selectParent();
-    std::vector<int> crossover(const std::vector<int> &parent1, const std::vector<int> &parent2);
-    void mutate(std::vector<int> &path);
+    std::vector<int> selectParent(std::mt19937 &rng);
+    std::vector<int> crossover(const std::vector<int> &parent1, const std::vector<int> &parent2, std::mt19937 &rng);
+    void mutate(std::vector<int> &path, std::mt19937 &rng);
     void improve2Opt(std::vector<int> &tour);
 
     // threading data
