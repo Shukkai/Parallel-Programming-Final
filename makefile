@@ -50,9 +50,10 @@ help:
 # main.o: main.cpp header/reader.h header/solver.h
 # reader.o: reader.cpp header/reader.h
 # solver.o: solver.cpp header/solver.h header/reader.h
+COMPUTE_CAPABILITY ?= 80
 
 cuda:
-	nvcc -lcurand -std=c++17 -O3 aco.cu -o aco_cuda.out
+	nvcc -lcurand -std=c++17 -O3 -Xcompiler '-fPIC' aco.cu -o aco_cuda.out
 	./aco_cuda.out $(testcase)
 
 

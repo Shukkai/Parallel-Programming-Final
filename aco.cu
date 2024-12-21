@@ -14,13 +14,13 @@
 #include <string>
 #include <vector>
 
-#define NUM_ANTS 10
-#define NUM_ITERATIONS 200
+#define NUM_ANTS 50
+#define NUM_ITERATIONS 100
 #define ALPHA 1.0
 #define BETA 2.0
 #define RHO 0.2
 #define Q 1.0
-#define GRID 2
+#define GRID 10
 #define BLOCK 5
 
 struct Point {
@@ -374,18 +374,25 @@ class ACOCUDA : public TSPSolver {
         cudaMalloc(&d_ants, NUM_ANTS * sizeof(Ant));
 
         float *d_pheromones;
-        cudaMalloc(&d_pheromones, numCities * numCities * sizeof(float));
-        // cudaMemcpy(d_pheromones, pheromones.data(), numCities * numCities * sizeof(float), cudaMemcpyHostToDevice);
+        cudaHostRegister(pheromones.data(), numCities * numCities * sizeof(float), cudaHostRegisterDefault);
+        cudaHostGetDevicePointer(&d_pheromones, pheromones.data(), 0);
+        // cudaMalloc(&d_pheromones, numCities * numCities * sizeof(float));
+        // cudaMemcpy(d_pheromones, pheromones.data(), numCities * numCities * sizeof(float),
+        // cudaMemcpyHostToDevice);
 
         Point *d_points;
-        cudaMalloc(&d_points, numCities * sizeof(Point));
-        cudaMemcpy(d_points, points.data(), numCities * sizeof(Point), cudaMemcpyHostToDevice);
+        cudaHostRegister(points.data(), numCities * sizeof(Point), cudaHostRegisterDefault);
+        cudaHostGetDevicePointer(&d_points, points.data(), 0);
+        // cudaMalloc(&d_points, numCities * sizeof(Point));
+        // cudaMemcpy(d_points, points.data(), numCities * sizeof(Point), cudaMemcpyHostToDevice);
 
         std::vector<int> tour(numCities);
         for (int iter = 0; iter < NUM_ITERATIONS; iter++) {
             // printf("Iter: %d, %lf\n", iter, pheromones[1]);
-            cudaMemcpy(d_pheromones, pheromones.data(), numCities * numCities * sizeof(float), cudaMemcpyHostToDevice);
+            // cudaMemcpy(d_pheromones, pheromones.data(), numCities * numCities * sizeof(float),
+            // cudaMemcpyHostToDevice);
 
+            restartAnts<<<GRID, BLOCK>>>(d_ants);
             contructSolutionCuda<<<GRID, BLOCK>>>(d_state, d_ants, d_pheromones, d_points, numCities);
             cudaDeviceSynchronize();
 
@@ -393,6 +400,11 @@ class ACOCUDA : public TSPSolver {
                 cudaMemcpy(tour.data(), d_ants[ant].tour, numCities * sizeof(int), cudaMemcpyDeviceToHost);
                 cudaMemcpy(pheromones.data(), d_pheromones, numCities * numCities * sizeof(float),
                            cudaMemcpyDeviceToHost);
+                // if (ant == 0) {
+                //     for (int i = 0; i < numCities; i++) {
+                //         printf("%d->", tour[i]);
+                //     }
+                // }
 
                 _2Opt(tour);
                 float tourLength = calculateTourDistance(tour);
@@ -411,11 +423,12 @@ class ACOCUDA : public TSPSolver {
             tau_min = tau_max * (1.0 - std::pow(0.05, 1.0 / numCities)) /
                       ((numCities / 2 - 1) * std::pow(0.05, 1.0 / numCities));
             updatePheromones(bestTour);
-
-            restartAnts<<<GRID, BLOCK>>>(d_ants);
         }
 
         totalDistance = globalBestDistance;
+
+        cudaHostUnregister(pheromones.data());
+        cudaHostUnregister(points.data());
     }
     const std::vector<int> &getTour() const { return bestTour; }
 };
